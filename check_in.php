@@ -107,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			<?php include ('includes/db_config.php');
 				$conex = mysqli_connect($server, $login, $password, $database) or die("Error: Unable to connect to DataBase.");
 				
-				#LOCATIONS.
 				$query = "SELECT id, CONCAT(detail,' ',building_id,room) AS location FROM Locations ORDER BY location";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
@@ -132,7 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 				}
 
-				#CONSULTANTS.
 				$query = "SELECT id, CONCAT(last_name,', ',first_name) AS consultant FROM Consultants ORDER BY consultant";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
@@ -157,7 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 				}
 
-				#REASONS.
 				$query = "SELECT id, description FROM Reasons ORDER BY description";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
