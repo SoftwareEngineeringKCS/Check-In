@@ -9,8 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// Minimal form validation:
 	if (isset($_POST['type_appointment'])) {
 		include ('includes/db_config.php');
-		$conex = mysqli_connect($server, $login, $password, $database) or die("Error: Unable to connect to DataBase.");	
-
+		
 		// Print the results:
 		echo "<h1>Check-In Result</h1>";
 		echo "<h2>" . $_POST['type_appointment'] . "</h2>";
@@ -20,10 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				if ($_POST['confirm_num'] == '') echo "<p class='error'>\"Confirmation Code\" cannot be empty!</p>";
 				echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 			} else {
-				echo "<p>Confirmation Code: " . $_POST['confirm_num'] . "</p>";
-				echo "<p>Student ID: " . $_POST['student_id1'] . "</p>";
-				#
-				echo "<p><h2 style='color: #6CBB3C'><i>Take a seat please.</i></h2></p>";
+				$query = sprintf("CALL usp_CheckIn_ByAppointment('%s','%s', '%s',@done,@id,@name,@reason,@consultant,@location,@message)", strtoupper($_POST['student_id1']), strtoupper($_POST['confirm_num']), $_POST['type_appointment']);
+				$result = mysqli_query($conex, $query);
+				$row = mysqli_fetch_array($result);
+
+				if ($row[0] == 0) {
+					echo "<p class='error'>" . $row[6] . "</p>";
+					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+				} else {
+					echo "<p>Student ID: " . $row[1] . "</p>";
+					echo "<p>Name: " . $row[2] . "</p>";
+					echo "<p>Reason: " . $row[3] . "</p>";
+					echo "<p>Consultant: " . $row[4] . "</p>";
+					echo "<p>Location: " . $row[5] . "</p>";
+					echo "<p><h2 style='color: #6CBB3C'><i>" . $row[6] . "</i></h2></p>";
+				}
+
+				mysqli_free_result($result);
+				mysqli_close($conex);
 			}
 		} else if ($_POST['type_appointment'] == 'Walk-In') {
 			if ($_POST['location'] == '' || $_POST['consultant'] == '' || $_POST['reason'] == '' || 
@@ -105,8 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		</div>
 		<div id="show_walk_in" style="display: none;">
 			<?php include ('includes/db_config.php');
-				$conex = mysqli_connect($server, $login, $password, $database) or die("Error: Unable to connect to DataBase.");
-				
+								
+				#LOCATIONS.
 				$query = "SELECT id, CONCAT(detail,' ',building_id,room) AS location FROM Locations ORDER BY location";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
@@ -131,6 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 				}
 
+				#CONSULTANTS.
 				$query = "SELECT id, CONCAT(last_name,', ',first_name) AS consultant FROM Consultants ORDER BY consultant";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
@@ -155,6 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 				}
 
+				#REASONS.
 				$query = "SELECT id, description FROM Reasons ORDER BY description";
 				$result = mysqli_query($conex, $query);
 				if ($result) {
