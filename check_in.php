@@ -2,16 +2,13 @@
 
 $page_title = 'Kean Career Services';
 include ('includes/header.html');
-
+include ('includes/db_config.php');
 // Check for form submission:
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+	// Print the results:
+	echo "<h1>Check-In Result</h1>";
 	// Minimal form validation:
 	if (isset($_POST['type_appointment'])) {
-		include ('includes/db_config.php');
-		
-		// Print the results:
-		echo "<h1>Check-In Result</h1>";
 		echo "<h2>" . $_POST['type_appointment'] . "</h2>";
 		if ($_POST['type_appointment'] == 'By-Appointment') {
 			if ($_POST['student_id1'] == '' || $_POST['confirm_num'] == '') {
@@ -22,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$query = sprintf("CALL usp_CheckIn_ByAppointment('%s','%s', '%s',@done,@id,@name,@reason,@consultant,@location,@message)", strtoupper($_POST['student_id1']), strtoupper($_POST['confirm_num']), $_POST['type_appointment']);
 				$result = mysqli_query($conex, $query);
 				$row = mysqli_fetch_array($result);
-
+				// Done or not.
 				if ($row[0] == 0) {
 					echo "<p class='error'>" . $row[6] . "</p>";
 					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
@@ -42,13 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			if ($_POST['location'] == '' || $_POST['consultant'] == '' || $_POST['reason'] == '' || 
 				$_POST['student_id2'] == '' || $_POST['first_name'] == '' || $_POST['last_name'] == '' || 
 				$_POST['email'] == '') {
-				if ($_POST['reason'] == '') echo "<p class='error'>\"Reason\" cannot be empty!</p>";
-				if ($_POST['student_id2'] == '') echo "<p class='error'>\"ID\" cannot be empty!</p>";
-				if ($_POST['first_name'] == '') echo "<p class='error'>\"First Name\" cannot be empty!</p>";
-				if ($_POST['last_name'] == '') echo "<p class='error'>\"Last Name\" cannot be empty!</p>";
-				if ($_POST['email'] == '') echo "<p class='error'>\"E-mail\" cannot be empty!</p>";
-				if ($_POST['consultant'] == '') echo "<p class='error'>\"Consultant\" cannot be empty!</p>";
-				if ($_POST['location'] == '') echo "<p class='error'>\"Location\" cannot be empty!</p>";
+				echo "<h2>The following fields cannot be empty!</h2>";
+				if ($_POST['reason'] == '') echo "<p class='error'>\"Reason\"</p>";
+				if ($_POST['student_id2'] == '') echo "<p class='error'>\"ID\"</p>";
+				if ($_POST['first_name'] == '') echo "<p class='error'>\"First Name\"</p>";
+				if ($_POST['last_name'] == '') echo "<p class='error'>\"Last Name\"</p>";
+				if ($_POST['email'] == '') echo "<p class='error'>\"E-mail\"</p>";
+				if ($_POST['consultant'] == '') echo "<p class='error'>\"Consultant\"</p>";
+				if ($_POST['location'] == '') echo "<p class='error'>\"Location\"</p>";
 				echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 			} else {
 				echo "<p>Student ID: " . $_POST['student_id2'] . "</p>";
@@ -212,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			</p>
 		</div>
 		<div id="show_submit" style="display: none;">
-			<p><input type="submit" name="submit" value="CHECK-IN" style="background-color: #6CBB3C; width: 200px" /></p>
+			<p><input type="submit" name="submit" value="CHECK-IN" style="background-color: #f7dc6f; height: 30px; width: 200px" /></p>
 		</div>
 	</form>
 </div>
