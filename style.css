@@ -105,13 +105,23 @@ body {
 	width:751px;
 }
 
-/* error and input */
+/* Added by Larry Ullman: */
 .error, .ad {
 	font-weight: bold;
 	color: #C00
 }
 
 input, select, .input {
+	padding: 5px;
+	font-weight: bold;
+	font-size: 1em;
+	color: #000000;
+	background: #FFFFFF;
+	border:1px dashed #074e89;
+}
+
+/* Added by Jorge Espada: */
+button, .button {
 	padding: 5px;
 	font-weight: bold;
 	font-size: 1em;
