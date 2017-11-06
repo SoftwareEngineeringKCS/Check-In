@@ -15,6 +15,12 @@ STRUCTURE IN root FOLDER: Pay attention to the levels of the tree.
     "pictures" folder:
   
         header_logo_01.jpg
-        
-    index.php
+       
+    appointment.php
     check_in.php
+    index.php
+    kean_logo.png
+    login.html
+    login_handle.php
+    sign_out.php
+    staff.php
