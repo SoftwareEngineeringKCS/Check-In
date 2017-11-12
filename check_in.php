@@ -81,8 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div id="check_in_process"<?php if (isset($_POST['type_appointment'])) echo ' style="display: none;"'; ?>>
 	<h1>Check-In Process</h1>
 	<form action="check_in.php" method="post">	
-		<h2>All fields are required!</h2>
-		<p>Type of Check-In:<br><br>
+		<h2>* Required Fields</h2>
+		<p>
 			<span class="input">
 				<input type="radio" name="type_appointment" value="By-Appointment"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'By-Appoitnment')) echo ' checked="checked"'; ?> onclick="byAppointment()" /> By-Appointment
 				<input type="radio" name="type_appointment" value="Walk-In"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'Walk-In')) echo ' checked="checked"'; ?> onclick="walkIn()" /> Walk-In
@@ -107,10 +107,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			}
 		</script>
 		<div id="show_by_appointment" style="display: none;">
-			<p>Student ID (without leading zeros):
+			<p>* Student ID (no leading zeros):
 				<br><input type="text" name="student_id1" value="<?php if (isset($_POST['student_id1'])) echo $_POST['student_id1']; ?>" style="width: 190px" />
 			</p>
-			<p>Confirmation Code:
+			<p>* Confirmation Code:
 				<br><input type="text" name="confirm_num" value="<?php if (isset($_POST['confirm_num'])) echo $_POST['confirm_num']; ?>" style="width: 190px" />
 			</p>
 		</div>
@@ -122,8 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$result = mysqli_query($conex, $query);
 				if ($result) {
 					if (mysqli_num_rows($result) > 0) {
-						echo "<p>Location:";
+						echo "<p>* Location:";
 						echo "<br><select name='location' style='width: 200px'>";
+							//echo "<option value=''>#Select</option>\n";
 							while ($row = mysqli_fetch_array($result)) {
 								$loc_id = $row['id'];
 								$loc_location = $row['location'];
@@ -132,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						echo "</select>";
 						echo "</p>";
 					} else {
-						echo "<p>Location:";
+						echo "<p>* Location:";
 						echo "<br><select name='location' style='width: 200px'>";
 							echo "<option value='' selected>EMPTY LIST</option>\n";
 						echo "</select>";
@@ -147,8 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$result = mysqli_query($conex, $query);
 				if ($result) {
 					if (mysqli_num_rows($result) > 0) {
-						echo "<p>Consultant:";
+						echo "<p>* Consultant:";
 						echo "<br><select name='consultant' style='width: 200px'>";
+							echo "<option value=''>#Select</option>\n";
 							while ($row = mysqli_fetch_array($result)) {
 								$con_id = $row['id'];
 								$con_consultant = $row['consultant'];
@@ -157,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						echo "</select>";
 						echo "</p>";
 					} else {
-						echo "<p>Consultant:";
+						echo "<p>* Consultant:";
 						echo "<br><select name='consultant' style='width: 200px'>";
 							echo "<option value='' selected>EMPTY LIST</option>\n";
 						echo "</select>";
@@ -172,8 +174,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$result = mysqli_query($conex, $query);
 				if ($result) {
 					if (mysqli_num_rows($result) > 0) {
-						echo "<p>Reason:";
+						echo "<p>* Reason:";
 						echo "<br><select name='reason' style='width: 200px'>";
+							echo "<option value=''>#Select</option>\n";
 							while ($row = mysqli_fetch_array($result)) {
 								$re_id = $row['id'];
 								$re_description = $row['description'];
@@ -182,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						echo "</select>";
 						echo "</p>";
 					} else {
-						echo "<p>Reasons:";
+						echo "<p>* Reasons:";
 						echo "<br><select name='reason' style='width: 200px'>";
 							echo "<option value='' selected>EMPTY LIST</option>\n";
 						echo "</select>";
@@ -196,16 +199,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				mysqli_close($conex);
 			?>
 
-			<p>Student ID (without leading zeros):
+			<p>* Student ID (without leading zeros):
 				<br><input type="text" name="student_id2" value="<?php if (isset($_POST['student_id2'])) echo $_POST['student_id2']; ?>" style="width: 190px" />
 			</p>
-			<p>First Name:
+			<p>* First Name:
 				<br><input type="text" name="first_name" value="<?php if (isset($_POST['first_name'])) echo $_POST['first_name']; ?>" style="width: 190px" />
 			</p>
-			<p>Last Name:
+			<p>* Last Name:
 				<br><input type="text" name="last_name" value="<?php if (isset($_POST['last_name'])) echo $_POST['last_name']; ?>" style="width: 190px" />
 			</p>
-			<p>E-mail:
+			<p>* E-mail:
 				<br><input type="text" name="email" value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?>" style="width: 190px" />
 			</p>
 		</div>
