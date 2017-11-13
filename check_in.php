@@ -227,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<h2>* Required Fields</h2>
 		<p>
 			<span class="input">
-				<input type="radio" name="type_appointment" value="By-Appointment"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'By-Appoitnment')) echo ' checked="checked"'; ?> onclick="byAppointment()" /> By-Appointment
+				<input type="radio" name="type_appointment" value="By-Appointment"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'By-Appointment')) echo ' checked="checked"'; ?> onclick="byAppointment()" /> By-Appointment
 				<input type="radio" name="type_appointment" value="Walk-In"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'Walk-In')) echo ' checked="checked"'; ?> onclick="walkIn()" /> Walk-In
 			</span>
 		</p>
