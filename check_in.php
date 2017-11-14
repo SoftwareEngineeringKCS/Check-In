@@ -110,6 +110,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 												<br>The new email is used by another student, please click back and use a different email.</p>";
 										echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
 									} else {
+										# If confirm.
+										$passSID = $_POST['student_id2'];
+										$passSFN = $_POST['first_name'];
+										$passSLN = $_POST['last_name'];
+										$passSEM = $_POST['email'];
+										$passCID = $_POST['consultant'];
+										$passLID = $_POST['location'];
+										$passTA = $_POST['type_appointment'];
+										$passRID = $_POST['reason'];
+
 										echo "<p><u>NEW DATA</u>
 												<br>  Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] .
 												"<br>  E-mail: " . $_POST['email'] . 
@@ -119,9 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 												someone else has used your information, please confirm and let the office
 												know about it, thank you.</p>";
 										echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>
-
-
-												<button type='button' style='height: 30px;' onclick=''>CONFIRM</button></p>"; #REMOVE TYPE
+												<button type='button' style='height: 30px;' onclick='confirmWalkin()'>CONFIRM</button></p>";
 									}
 								} else {
 									echo "<br>Problem trying to validate email: " . mysqli_error();
@@ -208,6 +216,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 ?>
+<script>
+	/*function testing() {
+
+	}*/
+	function confirmWalkin() {
+		//
+		var x = document.getElementById("check_in_result");
+	    var y = document.getElementById("check_in_confirmed");
+	    x.style.display = "none";
+		y.style.display = "block";
+		//
+		var passSID = "<?php echo $passSID ?>";
+		var passSFN = "<?php echo $passSFN ?>";
+		var passSLN = "<?php echo $passSLN ?>";
+		var passSEM = "<?php echo $passSEM ?>";
+		var passCID = "<?php echo $passCID ?>";
+		var passLID = "<?php echo $passLID ?>";
+		var passTA = "<?php echo $passTA ?>";
+		var passRID = "<?php echo $passRID ?>";
+
+	    var htm = $.ajax({
+	    type: "POST",
+	    url: "confirm_walk_in.php",
+	    data: {getSID: passSID, getSFN: passSFN, getSLN: passSLN, getSEM: passSEM, getCID: passCID, getLID: passLID, getTA: passTA, getRID: passRID},
+	    async: false
+	    }).responseText;
+
+	    if (htm) {
+	        $("#check_in_confirmed").html("<p>" + htm + "</p>");
+	        return true;
+	    } else {
+	        $("#check_in_confirmed").html("<p class='error'>Problem trying to set Walk-In!</p>");
+	        return false;
+	    }
+	}
+</script>
 <script type="text/javascript">
 	function goBack() {
 	    var x = document.getElementById("check_in_process");
