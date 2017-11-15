@@ -1,5 +1,5 @@
 * {
-	border:0;
+	border:1;
 	margin:0;
 	padding:0;
 }
@@ -61,6 +61,7 @@ body {
 }
 #navigation a {
 	color:#555;
+	font-weight: bold;
 	display:block;
 	line-height:40px;
 	text-align:center;
@@ -68,6 +69,7 @@ body {
 #navigation a:hover {
 	background:#074e89;
 	color:#ffffff;
+	font-weight: bold;
 }
 #navigation .active {
 	background:#e3e3e3;
@@ -126,6 +128,49 @@ button, .button {
 	font-weight: bold;
 	font-size: 1em;
 	color: #000000;
-	background: #FFFFFF;
+	background: #f7dc6f;
 	border:1px dashed #074e89;
+	border-radius: 3px;
+}
+
+.btntitle {
+  	line-height: .1px;
+  	height: 25px;
+  	width: 100px;
+	padding: 0px;
+	font-weight: bold;
+	font-size: 1em;
+	color: #ffffff;
+	background: #074e89;
+	border: 1px dotted #074e89;
+	border-radius: 3px;
+	margin-bottom: 1.5px;
+}
+
+.btnbook {
+  	line-height: .1px;
+  	height: 25px;
+  	width: 80px;
+	padding: 0px;
+	font-weight: bold;
+	font-size: 1em;
+	color: #000000;
+	background: #DAEA70;
+	border:1px dotted #074e89;
+	border-radius: 3px;
+	margin-bottom: 1.5px;
+}
+
+.btnbook_taken {
+  	line-height: .1px;
+  	height: 25px;
+  	width: 80px;
+	padding: 0px;
+	font-weight: bold;
+	font-size: 1em;
+	color: #808b96;
+	background: #d5d8dc;
+	border:1px dotted #074e89;
+	border-radius: 3px;
+	margin-bottom: 1.5px;
 }
