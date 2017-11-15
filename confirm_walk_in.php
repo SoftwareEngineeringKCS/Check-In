@@ -3,6 +3,8 @@
 	# If ID but no Email.
 	include ('includes/db_config.php');
 
+	date_default_timezone_set('America/New_York');
+
 	// Print the results:
 	echo "<h1>Check-In Result</h1>";
 	echo "<h2>Walk-In</h2>";
