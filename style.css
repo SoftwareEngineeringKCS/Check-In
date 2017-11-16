@@ -174,3 +174,33 @@ button, .button {
 	border-radius: 3px;
 	margin-bottom: 1.5px;
 }
+
+table, .table {
+	padding: 0px;
+	font-weight: normal;
+	font-size: 1em;
+	color: #000000;
+	background: #FFFFFF;
+	border:0px solid #b22222;
+	border-radius: 5px;
+}
+
+td, .td {
+	padding: 3px;
+	font-weight: normal;
+	font-size: 1em;
+	color: #000000;
+	background: #FFFFFF;
+	border:1px dotted #074e89;
+	border-radius: 3px;
+}
+
+th, .th {
+	padding: 3px;
+	font-weight: bold;
+	font-size: 1em;
+	color: #FFFFFF;
+	background: #074e89;
+	border:1px dotted #074e89;
+	border-radius: 3px;
+}
