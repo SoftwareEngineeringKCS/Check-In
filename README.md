@@ -9,8 +9,8 @@ STRUCTURE IN root FOLDER: Pay attention to the levels of the tree.
   
         db_config.php
         db_config_function.php
-        footer.php
-        header.php
+        footer.html
+        header.html
         style.css
 
     "pictures" folder:
