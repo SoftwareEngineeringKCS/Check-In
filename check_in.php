@@ -417,7 +417,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			</p>
 		</div>
 		<div id="show_submit" style="display: none;">
-			<p><input type="submit" name="submit" value="CHECK-IN" style="background-color: #f7dc6f; height: 30px; width: 200px" /></p>
+			<p><input class="button" type="submit" name="submit" value="CHECK-IN" style="height: 30px; width: 200px" /></p>
 		</div>
 	</form>
 </div>
