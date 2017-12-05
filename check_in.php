@@ -1,11 +1,12 @@
 <?php #JORGE ESPADA
 
+$show_error = FALSE; // Maintenance.
 $page_title = 'Kean Career Services';
 include ('includes/header.html');
 include ('includes/db_config.php');
 
 echo "<div class='menu_help' id='help' style='display: none;'>";
-echo "<p><b>Staff:</b><br>Administrators can set-up availability periods, maanage appointments, and view statistics. Administrators must login in order to use these features.</p>";
+echo "<p><b>Staff:</b><br>Administrators can set-up availability periods, manage appointments, and view statistics. Administrators must login in order to use these features.</p>";
 echo "<p><b>Appointments:</b><br>Students can book appointments and update personal information from previous meetings.</p>";
 echo "<p><b>Check-In:</b><br>Let the office know that you are waiting for counseling. There are two options: (1) By-Appointment, you will need your student id and a confirmation code which was sent to you by email. (2) Walk-In, no appointment is needed (longer waiting time).</p>";
 echo "<center><p><< CLICK HELP TO CLOSE >></p></center>";
@@ -26,25 +27,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				if ($_POST['student_id1'] == '') echo "\"ID\", ";
 				if ($_POST['confirm_num'] == '') echo "\"Confirmation Code\"";
 				echo "</p>";
-				echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
+				echo "<p><button type='button' value='BA' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 			} else {
 				$query = sprintf("CALL usp_CheckIn_ByAppointment('%s','%s', '%s',@done,@id,@name,@reason,@consultant,@location,@message)", strtoupper($_POST['student_id1']), strtoupper($_POST['confirm_num']), $_POST['type_appointment']);
 				$result = mysqli_query($conex, $query);
 				$row = mysqli_fetch_array($result);
-				// Done or not.
-				if ($row[0] == 0) {
-					echo "<p class='error'>" . $row[6] . "</p>";
-					echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
-				} else {
-					echo "<p>Student ID: " . $row[1] . "</p>";
-					echo "<p>Name: " . $row[2] . "</p>";
-					echo "<p>Reason: " . $row[3] . "</p>";
-					echo "<p>Consultant: " . $row[4] . "</p>";
-					echo "<p>Location: " . $row[5] . "</p>";
-					echo "<p><h2 style='color: #6CBB3C'><i>" . $row[6] . "</i></h2></p>";
-				}
+				if ($result) {
+					// Done or not.
+					if ($row[0] == 0) {
+						echo "<p class='error'>" . $row[6] . "</p>";
+						echo "<p><button type='button' value='BA' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
+					} else {
+						echo "<p class='result'>Student ID: " . $row[1];
+						echo "<br>Name: " . $row[2];
+						echo "<br>Reason: " . $row[3];
+						echo "<br>Consultant: " . $row[4];
+						echo "<br>Location: " . $row[5];
+						echo "<br><h2 style='color: #6CBB3C'><i>" . $row[6] . "</i></h2></p>";
+						# Auto-Redirect
 
-				mysqli_free_result($result);
+
+					}
+
+					mysqli_free_result($result);
+				} else {
+					echo "<p class='error'>Check-In Validation... Failed! [Connection Error]";
+					echo "<br>Contact Administrator!</p>";
+					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+				}
+				
 				mysqli_close($conex);
 			}
 		} else if ($_POST['type_appointment'] == 'Walk-In') {
@@ -52,14 +63,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$_POST['student_id2'] == '' || $_POST['first_name'] == '' || $_POST['last_name'] == '' || 
 				$_POST['email'] == '') {
 				echo "<h2>The following fields cannot be empty!</h2>";
-				if ($_POST['reason'] == '') echo "<p class='error'>\"Reason\"</p>";
-				if ($_POST['student_id2'] == '') echo "<p class='error'>\"ID\"</p>";
-				if ($_POST['first_name'] == '') echo "<p class='error'>\"First Name\"</p>";
-				if ($_POST['last_name'] == '') echo "<p class='error'>\"Last Name\"</p>";
-				if ($_POST['email'] == '') echo "<p class='error'>\"E-mail\"</p>";
-				if ($_POST['consultant'] == '') echo "<p class='error'>\"Consultant\"</p>";
-				if ($_POST['location'] == '') echo "<p class='error'>\"Location\"</p>";
-				echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
+				echo "<p class='error'>";
+				if ($_POST['location'] == '') echo "\"Location\", ";
+				if ($_POST['consultant'] == '') echo "\"Consultant\", ";
+				if ($_POST['reason'] == '') echo "\"Reason\", ";
+				if ($_POST['student_id2'] == '') echo "\"ID\", ";
+				if ($_POST['first_name'] == '') echo "\"First Name\", ";
+				if ($_POST['last_name'] == '') echo "\"Last Name\", ";
+				if ($_POST['email'] == '') echo "\"E-mail\"";
+				echo "</p>";
+				echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 			} else {
 				# Validate Id and Email.
 				$query = sprintf("SELECT * FROM Students WHERE id = '%s' AND email = '%s'", $_POST['student_id2'], $_POST['email']);
@@ -208,9 +221,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						}
 					}
 				} else {
-					echo "<br>Problem trying to validate Student: " . mysqli_error();
-					echo "<br>Contact Administrator!";
-					echo "<br><a href='check_in.php'>TRY AGAIN</a>";
+					echo "<p class='error'>Student Validation... Failed! [Connection Error]";
+					if ($show_error) {
+						echo "<br>[<i>" . mysqli_error() . "</i>]";
+					}
+					echo "<br>Contact Administrator!</p>";
+					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 				}
 				
 				mysqli_free_result($result);
@@ -237,7 +253,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	    }
 	}
 </script>
-
 <script>
 	function confirmWalkin() {
 		//
@@ -281,6 +296,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	    } else if (x.style.display === "none" && y.style.display === "block") {
 	    	x.style.display = "block";
 		    y.style.display = "none";
+	    }
+	}
+</script>
+<script type="text/javascript">
+	function mainDisplay(btn) {
+	    var x = document.getElementById("check_in_process");
+	    var y = document.getElementById("check_in_result");
+	    if (x.style.display === "block" && y.style.display === "none") {
+	    	x.style.display = "none";
+		    y.style.display = "block";
+	    } else if (x.style.display === "none" && y.style.display === "block") {
+	    	x.style.display = "block";
+		    y.style.display = "none";
+	    }
+	    if (btn.value === "BA") {
+	    	byAppointment();
+	    } else if (btn.value === "WI") {
+	    	walkIn();
 	    }
 	}
 </script>
