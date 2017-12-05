@@ -22,8 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if ($_POST['type_appointment'] == 'By-Appointment') {
 			if ($_POST['student_id1'] == '' || $_POST['confirm_num'] == '') {
 				echo "<h2>The following fields cannot be empty!</h2>";
-				if ($_POST['student_id1'] == '') echo "<p class='error'>\"ID\"</p>";
-				if ($_POST['confirm_num'] == '') echo "<p class='error'>\"Confirmation Code\"</p>";
+				echo "<p class='error'>";
+				if ($_POST['student_id1'] == '') echo "\"ID\", ";
+				if ($_POST['confirm_num'] == '') echo "\"Confirmation Code\"";
+				echo "</p>";
 				echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
 			} else {
 				$query = sprintf("CALL usp_CheckIn_ByAppointment('%s','%s', '%s',@done,@id,@name,@reason,@consultant,@location,@message)", strtoupper($_POST['student_id1']), strtoupper($_POST['confirm_num']), $_POST['type_appointment']);
