@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			} else {
 				$query = sprintf("CALL usp_CheckIn_ByAppointment('%s','%s', '%s',@done,@id,@name,@reason,@consultant,@location,@message)", strtoupper($_POST['student_id1']), strtoupper($_POST['confirm_num']), $_POST['type_appointment']);
 				$result = mysqli_query($conex, $query);
-				$row = mysqli_fetch_array($result);
 				if ($result) {
+					$row = mysqli_fetch_array($result);
 					// Done or not.
 					if ($row[0] == 0) {
 						echo "<p class='error'>" . $row[6] . "</p>";
@@ -79,59 +79,113 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$result = mysqli_query($conex, $query);
 				if ($result) {
 					if (mysqli_num_rows($result) > 0) {
+						# Validate Identical data when updating (Rows changed = 0).
+						$row = mysqli_fetch_array($result);
+						$getFname = $row['first_name'];
+						$getLname = $row['last_name'];
+
 						# Update Student.
 						$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s' WHERE id = '%s'", $_POST['first_name'], $_POST['last_name'], $_POST['student_id2']);
-						$result = mysqli_query($conex, $query);
-						# Save check-in.
-						$set_in_datetime = date("Y-m-d H:i:s");
-						$query = sprintf("INSERT INTO Students_Check_In VALUES(NULL, 1, '%s', '%s', '%s', '%s', '%s', '%s', '')", $_POST['student_id2'], $_POST['consultant'], $_POST['location'], $_POST['type_appointment'], $_POST['reason'], $set_in_datetime);
-						$result = mysqli_query($conex, $query);
-						# Show results.
-						echo "<p>Student ID: " . $_POST['student_id2'] . "</p>";
-						echo "<p>Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] . "</p>";
-						$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $_POST['reason']);
-						$result = mysqli_query($conex, $query);
-						$row = mysqli_fetch_array($result);
-						if ($result) {
-							echo "<p>Reason: " . $row[0] . "</p>";
+						$res1 = mysqli_query($conex, $query);
+
+						if (mysqli_affected_rows($conex) == 0 && ($getFname != $_POST['first_name'] || $getLname != $_POST['last_name'])) {
+							echo "<p class='error'>Validating ID and Email... Failed! [No Student found] OK";
+							if ($show_error) {
+								echo "<br>[<i>" . mysqli_error() . "</i>]";
+							}
+							echo "<br>Contact Administrator!</p>";
+							echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 						} else {
-							echo "<p class='error'>Reason: Error!</p>";
+							# Save check-in.
+							$set_in_datetime = date("Y-m-d H:i:s");
+							$query = sprintf("INSERT INTO Students_Check_In VALUES(NULL, 1, '%s', '%s', '%s', '%s', '%s', '%s', '')", $_POST['student_id2'], $_POST['consultant'], $_POST['location'], $_POST['type_appointment'], $_POST['reason'], $set_in_datetime);
+							$res2 = mysqli_query($conex, $query);
+
+							if (mysqli_affected_rows($conex) == 0) {
+								echo "<p class='result'>Updating student new data... Done!</p>";
+								echo "<p class='error'>Saving Check-In... Failed! [Connection Error]";
+								if ($show_error) {
+									echo "<br>[<i>" . mysqli_error() . "</i>]";
+								}
+								echo "<br>Contact Administrator!</p>";
+								echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+							} else {
+								# Show results.
+								echo "<p class='result'>Updating student new data... Done!";
+								echo "<br>Saving Check-In... Done!";
+								echo "<br>";
+								echo "<br>Student ID: " . $_POST['student_id2'];
+								echo "<br>Name: " . $_POST['last_name'] . ", " . $_POST['first_name'];
+
+								$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $_POST['reason']);
+								$res3 = mysqli_query($conex, $query);
+								if ($res3) {
+									if (mysqli_num_rows($res3) > 0) {
+										$row = mysqli_fetch_array($res3);
+										echo "<br>Reason: " . $row[0];
+									} else {
+										echo "<p class='error'>Reason: [No Reason found]</p>";	
+									}
+									mysqli_free_result($res3);
+								} else {
+									echo "<p class='error'>Reason: [Connection Error]</p>";
+								}
+
+								$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $_POST['consultant']);
+								$res4 = mysqli_query($conex, $query);
+								if ($res4) {
+									if (mysqli_num_rows($res4) > 0) {
+										$row = mysqli_fetch_array($res4);
+										echo "<br>Consultant: " . $row[0];
+									} else {
+										echo "<p class='error'>Consultant: [No Consultant found]</p>";	
+									}
+									mysqli_free_result($res4);
+								} else {
+									echo "<p class='error'>Consultant: [Connection Error]</p>";
+								}
+
+								$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $_POST['location']);
+								$res5 = mysqli_query($conex, $query);
+								if ($res5) {
+									if (mysqli_num_rows($res5) > 0) {
+										$row = mysqli_fetch_array($res5);
+										echo "<br>Location: " . $row[0];
+									} else {
+										echo "<p class='error'>Location: [No Location found]</p>";	
+									}
+									mysqli_free_result($res5);
+								} else {
+									echo "<p class='error'>Location: [Connection Error]</p>";
+								}
+
+								echo "<br><h2 style='color: #6CBB3C'>Take a seat please.</h2>";
+								echo "</p>";
+
+								# Auto-Redirect
+
+
+							}
 						}
-						$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $_POST['consultant']);
-						$result = mysqli_query($conex, $query);
-						$row = mysqli_fetch_array($result);
-						if ($result) {
-							echo "<p>Consultant: " . $row[0] . "</p>";
-						} else {
-							echo "<p class='error'>Consultant: Error!</p>";
-						}
-						$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $_POST['location']);
-						$result = mysqli_query($conex, $query);
-						$row = mysqli_fetch_array($result);
-						if ($result) {
-							echo "<p>Location: " . $row[0] . "</p>";
-						} else {
-							echo "<p class='error'>Location: Error!</p>";
-						}
-						echo "<p><h2 style='color: #6CBB3C'>Take a seat please.</h2></p>";
+
 					} else {
 						# Validate Student.
 						$query = sprintf("SELECT * FROM Students WHERE id = '%s'", $_POST['student_id2']);
-						$result = mysqli_query($conex, $query);
-						if ($result) {
-							if (mysqli_num_rows($result) > 0) {
+						$res1 = mysqli_query($conex, $query);
+						if ($res1) {
+							if (mysqli_num_rows($res1) > 0) {
 								echo "<h2>This ID \"" . $_POST['student_id2'] .  "\" has been used before!</h2>";
 								# Validate email.
 								$query = sprintf("SELECT * FROM Students WHERE email = '%s'", $_POST['email']);
-								$result = mysqli_query($conex, $query);
-								if ($result) {
-									if (mysqli_num_rows($result) > 0) {
-										echo "<p><u>NEW DATA</u>
+								$res2 = mysqli_query($conex, $query);
+								if ($res2) {
+									if (mysqli_num_rows($res2) > 0) {
+										echo "<p class='result'><u>NEW DATA</u>
 												<br>  Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] .
 												"<br>  E-mail: " . $_POST['email'] . 
 												"</p><p class='ad'><u>BLOCKING</u>: 
 												<br>The new email is used by another student, please click back and use a different email.</p>";
-										echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
+										echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 									} else {
 										# If confirm.
 										$passSID = $_POST['student_id2'];
@@ -143,83 +197,149 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 										$passTA = $_POST['type_appointment'];
 										$passRID = $_POST['reason'];
 
-										echo "<p><u>NEW DATA</u>
+										echo "<p class='result'><u>NEW DATA</u>
 												<br>  Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] .
 												"<br>  E-mail: " . $_POST['email'] . 
 												"</p><p class='ad'><u>WARNING</u>: 
 												<br>If you choose \"CONFIRM\" student information will be updated with the new data. 
-												<u>Identification will be required during meeting</u>.\" If you believe that
+												<u>Identification will be required during meeting</u>. If you believe that
 												someone else has used your information, please confirm and let the office
 												know about it, thank you.</p>";
-										echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>
+										echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button>
 												<button type='button' style='height: 30px;' onclick='confirmWalkin()'>CONFIRM</button></p>";
 									}
+
+									mysqli_free_result($res2);
 								} else {
-									echo "<br>Problem trying to validate email: " . mysqli_error();
-									echo "<br>Contact Administrator!";
-									echo "<br><a href='check_in.php'>TRY AGAIN</a>";
+									echo "<p class='error'>Email Validation... Failed! [Connection Error]";
+									if ($show_error) {
+										echo "<br>[<i>" . mysqli_error() . "</i>]";
+									}
+									echo "<br>Contact Administrator!</p>";
+									echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 								}
 							} else {
 								# Validate email.
 								$query = sprintf("SELECT * FROM Students WHERE email = '%s'", $_POST['email']);
-								$result = mysqli_query($conex, $query);
-								if ($result) {
-									if (mysqli_num_rows($result) > 0) {
-										echo "<p><u>NEW DATA</u>
+								$res2 = mysqli_query($conex, $query);
+								if ($res2) {
+									if (mysqli_num_rows($res2) > 0) {
+										echo "<p class='result'><u>NEW DATA</u>
 												<br>  Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] .
 												"<br>  E-mail: " . $_POST['email'] . 
 												"</p><p class='ad'><u>BLOCKING</u>: 
 												<br>The new email is used by another student, please click back and use a different email.</p>";
-										echo "<p><button type='button' style='height: 30px;' onclick='goBack()'>BACK</button>";
+										echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 									} else {
 										# Save New Student.
 										$query = sprintf("INSERT INTO Students VALUES('%s', '%s', '%s', '', '', '', '%s', '', '', '', '', '')", $_POST['student_id2'], $_POST['first_name'], $_POST['last_name'], $_POST['email']);
-										$result = mysqli_query($conex, $query);
-										# Save check-in.
-										$set_in_datetime = date("Y-m-d H:i:s");
-										$query = sprintf("INSERT INTO Students_Check_In VALUES(NULL, 1, '%s', '%s', '%s', '%s', '%s', '%s', '')", $_POST['student_id2'], $_POST['consultant'], $_POST['location'], $_POST['type_appointment'], $_POST['reason'], $set_in_datetime);
-										$result = mysqli_query($conex, $query);
-										# Show results.
-										echo "<p>Student ID: " . $_POST['student_id2'] . "</p>";
-										echo "<p>Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] . "</p>";
-										$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $_POST['reason']);
-										$result = mysqli_query($conex, $query);
-										$row = mysqli_fetch_array($result);
-										if ($result) {
-											echo "<p>Reason: " . $row[0] . "</p>";
+										$res3 = mysqli_query($conex, $query);
+
+										if (mysqli_affected_rows($conex) == 0) {
+											echo "<p class='error'>Saving new student... Failed! [Connection Error]";
+											if ($show_error) {
+												echo "<br>[<i>" . mysqli_error() . "</i>]";
+											}
+											echo "<br>Contact Administrator!</p>";
+											echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 										} else {
-											echo "<p class='error'>Reason: Error!</p>";
+											# Save check-in.
+											$set_in_datetime = date("Y-m-d H:i:s");
+											$query = sprintf("INSERT INTO Students_Check_In VALUES(NULL, 1, '%s', '%s', '%s', '%s', '%s', '%s', '')", $_POST['student_id2'], $_POST['consultant'], $_POST['location'], $_POST['type_appointment'], $_POST['reason'], $set_in_datetime);
+											$res4 = mysqli_query($conex, $query);
+
+											if (mysqli_affected_rows($conex) == 0) {
+												echo "<p class='result'>Saving new student... Done!</p>";
+												echo "<p class='error'>Saving Check-In... Failed! [Connection Error]";
+												if ($show_error) {
+													echo "<br>[<i>" . mysqli_error() . "</i>]";
+												}
+												echo "<br>Contact Administrator!</p>";
+												echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+											} else {
+												# Show results.
+												echo "<p class='result'>Saving new student... Done!";
+												echo "<br>Saving Check-In... Done!";
+												echo "<br>";
+												echo "<br>Student ID: " . $_POST['student_id2'];
+												echo "<br>Name: " . $_POST['last_name'] . ", " . $_POST['first_name'];
+
+												$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $_POST['reason']);
+												$res5 = mysqli_query($conex, $query);
+												if ($res5) {
+													if (mysqli_num_rows($res5) > 0) {
+														$row = mysqli_fetch_array($res5);
+														echo "<br>Reason: " . $row[0];
+													} else {
+														echo "<p class='error'>Reason: [No Reason found]</p>";	
+													}
+													mysqli_free_result($res5);
+												} else {
+													echo "<p class='error'>Reason: [Connection Error]</p>";
+												}
+
+												$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $_POST['consultant']);
+												$res6 = mysqli_query($conex, $query);
+												if ($res6) {
+													if (mysqli_num_rows($res6) > 0) {
+														$row = mysqli_fetch_array($res6);
+														echo "<br>Consultant: " . $row[0];
+													} else {
+														echo "<p class='error'>Consultant: [No Consultant found]</p>";	
+													}
+													mysqli_free_result($res6);
+												} else {
+													echo "<p class='error'>Consultant: [Connection Error]</p>";
+												}
+
+												$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $_POST['location']);
+												$res7 = mysqli_query($conex, $query);
+												if ($res7) {
+													if (mysqli_num_rows($res7) > 0) {
+														$row = mysqli_fetch_array($res7);
+														echo "<br>Location: " . $row[0];
+													} else {
+														echo "<p class='error'>Location: [No Location found]</p>";	
+													}
+													mysqli_free_result($res7);
+												} else {
+													echo "<p class='error'>Location: [Connection Error]</p>";
+												}
+
+												echo "<br><h2 style='color: #6CBB3C'>Take a seat please.</h2>";
+												echo "</p>";
+
+												# Auto-Redirect
+
+
+											}
 										}
-										$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $_POST['consultant']);
-										$result = mysqli_query($conex, $query);
-										$row = mysqli_fetch_array($result);
-										if ($result) {
-											echo "<p>Consultant: " . $row[0] . "</p>";
-										} else {
-											echo "<p class='error'>Consultant: Error!</p>";
-										}
-										$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $_POST['location']);
-										$result = mysqli_query($conex, $query);
-										$row = mysqli_fetch_array($result);
-										if ($result) {
-											echo "<p>Location: " . $row[0] . "</p>";
-										} else {
-											echo "<p class='error'>Location: Error!</p>";
-										}
-										echo "<p><h2 style='color: #6CBB3C'>Take a seat please.</h2></p>";
+
 									}
+
+									mysqli_free_result($res2);
 								} else {
-									echo "<br>Problem trying to validate email: " . mysqli_error();
-									echo "<br>Contact Administrator!";
-									echo "<br><a href='check_in.php'>TRY AGAIN</a>";
+									echo "<p class='error'>Email Validation... Failed! [Connection Error]";
+									if ($show_error) {
+										echo "<br>[<i>" . mysqli_error() . "</i>]";
+									}
+									echo "<br>Contact Administrator!</p>";
+									echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 								}
 							}
+
+							mysqli_free_result($res1);
 						} else {
-							echo "<br>Problem trying to validate student: " . mysqli_error();
-							echo "<br>Contact Administrator!";
-							echo "<br><a href='check_in.php'>TRY AGAIN</a>";
+							echo "<p class='error'>Student Validation... Failed! [Connection Error]";
+							if ($show_error) {
+								echo "<br>[<i>" . mysqli_error() . "</i>]";
+							}
+							echo "<br>Contact Administrator!</p>";
+							echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 						}
 					}
+
+					mysqli_free_result($result);
 				} else {
 					echo "<p class='error'>Student Validation... Failed! [Connection Error]";
 					if ($show_error) {
@@ -229,7 +349,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 				}
 				
-				mysqli_free_result($result);
 				mysqli_close($conex);				
 			}
 		}
