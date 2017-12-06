@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						$res1 = mysqli_query($conex, $query);
 
 						if (mysqli_affected_rows($conex) == 0 && ($getFname != $_POST['first_name'] || $getLname != $_POST['last_name'])) {
-							echo "<p class='error'>Validating ID and Email... Failed! [No Student found] OK";
+							echo "<p class='error'>Validating ID and Email... Failed! [No Student found]";
 							if ($show_error) {
 								echo "<br>[<i>" . mysqli_error() . "</i>]";
 							}
