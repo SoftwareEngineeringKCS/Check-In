@@ -1,95 +1,108 @@
 <?php #JORGE ESPADA
 	
-	function createCode($studentid, $btndatetime) {
-		include ('includes/db_config_function.php');
-		$code = "";
-		$c = 1;	
-		while ($c > 0) {
-			$random_hash = md5(uniqid(rand(), true));
-			$processed_hash = strtoupper("K" . substr($random_hash, 3,3) . substr($random_hash, 9, 3) . substr($random_hash, 15, 3));
-			$f_query = sprintf("SELECT confirm_num FROM Students_Appointment WHERE confirm_num = '%s'", $processed_hash);
-			$f_result = mysqli_query($f_conex, $f_query);
-			if ($f_result) {
-				if (mysqli_num_rows($f_result) > 0) {
-					$c = 1;
-				} else {
-					$code = $processed_hash;
-					$c = 0;
-				}
-				mysqli_free_result($f_result);
-			} else {
-				echo "<p class='error'>Problem trying to create dynamic confirmation code, a static code was created instead.</p>";
-				# Manual Code.
-				$code = date_format(date_create($btndatetime), "YmdHi") . "-" . $studentid;
-				$c = 0;
-			}
-		}
-		mysqli_close($f_conex);
-		return $code;
-	}
-	
+	$conf_show_error = FALSE; // Maintenance.
 	# If ID but no Email.
 	include ('includes/db_config.php');
 
+	date_default_timezone_set('America/New_York');
+
 	// Print the results:
-	echo "<h1>Appointment Result</h1>";
+	echo "<h1>Check-In Result</h1>";
+	echo "<h2>Walk-In</h2>";
 
 	$getSID = $_REQUEST['getSID'];
 	$getSFN = $_REQUEST['getSFN'];
 	$getSLN = $_REQUEST['getSLN'];
 	$getSEM = $_REQUEST['getSEM'];
-	$getSCP = $_REQUEST['getSCP'];
-	$getBTN = $_REQUEST['getBTN'];
 	$getCID = $_REQUEST['getCID'];
 	$getLID = $_REQUEST['getLID'];
+	$getTA = $_REQUEST['getTA'];
 	$getRID = $_REQUEST['getRID'];
 
 	# Update Student.
-	$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s', email = '%s', cell_phone = '%s' WHERE id = '%s'", $getSFN, $getSLN, $getSEM, $getSCP, $getSID);
-	$result = mysqli_query($conex, $query);
-	# Save appointment.
-	$pos = strpos($getBTN, ",");
-	$getTimeId = substr($getBTN, 0, $pos);
-	$getDateTime = substr($getBTN, $pos+1);
-	$getCode = createCode($getSID, $getDateTime);
-	$query = sprintf("INSERT INTO Students_Appointment VALUES(NULL, '%s', '%s', '%s', '%s', '%s', '%s', 0, 0, '', 0, '')", $getSID, $getCID, $getLID, $getRID, $getDateTime, $getCode);
-	$result = mysqli_query($conex, $query);
-	# Update Time Status.
-	$query = sprintf("UPDATE Availability_Times SET free = 0 WHERE id = '%s'", $getTimeId);
-	$result = mysqli_query($conex, $query);
-	# Send confirmation code (bye email).
+	$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s', email = '%s' WHERE id = '%s'", $getSFN, $getSLN, $getSEM, $getSID);
+	$conf_res1 = mysqli_query($conex, $query);
+
+	if (mysqli_affected_rows($conex) == 0) {
+		echo "<p class='error'>Updating student new data... Failed! [No Student found]";
+		if ($conf_show_error) {
+			echo "<br>[<i>" . mysqli_error() . "</i>]";
+		}
+		echo "<br>Contact Administrator!</p>";
+		echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+	} else {
+		# Save check-in.
+		$set_in_datetime = date("Y-m-d H:i:s");
+		$query = sprintf("INSERT INTO Students_Check_In VALUES(NULL, 1, '%s', '%s', '%s', '%s', '%s', '%s', '')", $getSID, $getCID, $getLID, $getTA, $getRID, $set_in_datetime);
+		$conf_res2 = mysqli_query($conex, $query);
+
+		if (mysqli_affected_rows($conex) == 0) {
+			echo "<p class='result'>Updating student new data... Done!</p>";
+			echo "<p class='error'>Saving Check-In... Failed! [Connection Error]";
+			if ($conf_show_error) {
+				echo "<br>[<i>" . mysqli_error() . "</i>]";
+			}
+			echo "<br>Contact Administrator!</p>";
+			echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
+		} else {
+			# Show results.
+			echo "<p class='result'>Updating student new data... Done!";
+			echo "<br>Saving Check-In... Done!";
+			echo "<br>";
+			echo "<br>Student ID: " . $getSID;
+			echo "<br>Name: " . $getSLN . ", " . $getSFN;
+			
+			$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $getRID);
+			$conf_res3 = mysqli_query($conex, $query);
+			if ($conf_res3) {
+				if (mysqli_num_rows($conf_res3) > 0) {
+					$row = mysqli_fetch_array($conf_res3);
+					echo "<br>Reason: " . $row[0];
+				} else {
+					echo "<p class='error'>Reason: [No Reason found]</p>";	
+				}
+				mysqli_free_result($conf_res3);
+			} else {
+				echo "<p class='error'>Reason: [Connection Error]</p>";
+			}
+			
+			$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $getCID);
+			$conf_res4 = mysqli_query($conex, $query);
+			if ($conf_res4) {
+				if (mysqli_num_rows($conf_res4) > 0) {
+					$row = mysqli_fetch_array($conf_res4);
+					echo "<br>Consultant: " . $row[0];
+				} else {
+					echo "<p class='error'>Consultant: [No Consultant found]</p>";	
+				}
+				mysqli_free_result($conf_res4);
+			} else {
+				echo "<p class='error'>Consultant: [Connection Error]</p>";
+			}
+			
+			$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $getLID);
+			$conf_res5 = mysqli_query($conex, $query);
+			if ($conf_res5) {
+				if (mysqli_num_rows($conf_res5) > 0) {
+					$row = mysqli_fetch_array($conf_res5);
+					echo "<br>Location: " . $row[0];
+				} else {
+					echo "<p class='error'>Location: [No Location found]</p>";	
+				}
+				mysqli_free_result($conf_res5);
+			} else {
+				echo "<p class='error'>Location: [Connection Error]</p>";
+			}
+
+			echo "<br><h2 style='color: #6CBB3C'>Take a seat please.</h2>";
+			echo "</p>";
+
+			# Auto-Redirect
 
 
-	# Show results.
-	echo "<p>Student ID: " . $getSID . "</p>";
-	echo "<p>Name: " . $getSLN . ", " . $getSFN . "</p>";
-	$query = sprintf("SELECT description FROM Reasons WHERE id = '%s'", $getRID);
-	$result = mysqli_query($conex, $query);
-	$row = mysqli_fetch_array($result);
-	if ($result) {
-		echo "<p>Reason: " . $row[0] . "</p>";
-	} else {
-		echo "<p class='error'>Reason: Error!</p>";
+		}
 	}
-	$query = sprintf("SELECT CONCAT(last_name,', ',first_name) FROM Consultants WHERE id = '%s'", $getCID);
-	$result = mysqli_query($conex, $query);
-	$row = mysqli_fetch_array($result);
-	if ($result) {
-		echo "<p>Consultant: " . $row[0] . "</p>";
-	} else {
-		echo "<p class='error'>Consultant: Error!</p>";
-	}
-	$query = sprintf("SELECT CONCAT(detail,' ',building_id,room) FROM Locations WHERE id = '%s'", $getLID);
-	$result = mysqli_query($conex, $query);
-	$row = mysqli_fetch_array($result);
-	if ($result) {
-		echo "<p>Location: " . $row[0] . "</p>";
-	} else {
-		echo "<p class='error'>Location: Error!</p>";
-	}
-	echo "<p><h2 style='color: #6CBB3C'>A Confirmation Code was sent to your email!</h2></p>";
 
-	mysqli_free_result($result);
 	mysqli_close($conex);
 
 ?>
