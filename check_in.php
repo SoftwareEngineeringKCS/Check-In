@@ -52,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 					mysqli_free_result($result);
 				} else {
 					echo "<p class='error'>Check-In Validation... Failed! [Connection Error]";
+					if ($show_error) {
+						echo "<br>[<i>" . mysqli_error() . "</i>]";
+					}
 					echo "<br>Contact Administrator!</p>";
 					echo "<p><a href='check_in.php'>TRY AGAIN</a></p>";
 				}
