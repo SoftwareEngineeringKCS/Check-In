@@ -409,19 +409,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 </script>
 <script type="text/javascript">
-	function goBack() {
-	    var x = document.getElementById("check_in_process");
-	    var y = document.getElementById("check_in_result");
-	    if (x.style.display === "block" && y.style.display === "none") {
-	    	x.style.display = "none";
-		    y.style.display = "block";
-	    } else if (x.style.display === "none" && y.style.display === "block") {
-	    	x.style.display = "block";
-		    y.style.display = "none";
-	    }
-	}
-</script>
-<script type="text/javascript">
 	function mainDisplay(btn) {
 	    var x = document.getElementById("check_in_process");
 	    var y = document.getElementById("check_in_result");
