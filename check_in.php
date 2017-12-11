@@ -64,7 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		} else if ($_POST['type_appointment'] == 'Walk-In') {
 			if ($_POST['location'] == '' || $_POST['consultant'] == '' || $_POST['reason'] == '' || 
 				$_POST['student_id2'] == '' || $_POST['first_name'] == '' || $_POST['last_name'] == '' || 
-				$_POST['email'] == '') {
+				$_POST['email'] == '' || $_POST['state'] == '' || $_POST['zipcode'] == '' || $_POST['major'] == '' || $_POST['education'] == '' || $_POST['ethnic_racial'] == '' || 
+				$_POST['gender'] == '') {
 				echo "<h2>The following fields cannot be empty!</h2>";
 				echo "<p class='error'>";
 				if ($_POST['location'] == '') echo "\"Location\", ";
@@ -73,7 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				if ($_POST['student_id2'] == '') echo "\"ID\", ";
 				if ($_POST['first_name'] == '') echo "\"First Name\", ";
 				if ($_POST['last_name'] == '') echo "\"Last Name\", ";
-				if ($_POST['email'] == '') echo "\"E-mail\"";
+				if ($_POST['email'] == '') echo "\"E-mail\", ";
+				if ($_POST['state'] == '') echo "\"State\", ";
+				if ($_POST['zipcode'] == '') echo "\"Zipcode\", ";
+				if ($_POST['major'] == '') echo "\"Major\", ";
+				if ($_POST['education'] == '') echo "\"Education (year)\", ";
+				if ($_POST['ethnic_racial'] == '') echo "\"Race/Ethnicity\", ";
+				if ($_POST['gender'] == '') echo "\"Gender\"";
 				echo "</p>";
 				echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 			} else {
@@ -86,12 +93,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 						$row = mysqli_fetch_array($result);
 						$getFname = $row['first_name'];
 						$getLname = $row['last_name'];
+						$getMid = $row['major_id'];
+						$getEid = $row['edu_id'];
+						$getREid = $row['er_id'];
+						$getGender = $row['gender'];
+						$getBD = $row['birthdate'];
+						$getCphone = $row['cell_phone'];
+						$getHphone = $row['home_phone'];
+						$getAddress = $row['address'];
+						$getState = $row['state'];
+						$getZC = $row['zipcode'];
+
+						/* TEST
+						echo "<br>TEST: " . $_POST['first_name'];
+						echo "<br>TEST: " . $_POST['last_name'];
+						echo "<br>TEST: " . $_POST['address'];
+						echo "<br>TEST: " . $_POST['state'];
+						echo "<br>TEST: " . $_POST['zipcode'];
+						echo "<br>TEST: " . $_POST['major'];
+						echo "<br>TEST: " . $_POST['education'];
+						echo "<br>TEST: " . $_POST['ethnic_racial'];
+						echo "<br>TEST: " . $_POST['gender'];
+						echo "<br>TEST: " . $_POST['birthdate'];
+						echo "<br>TEST: " . $_POST['cell_phone'];
+						echo "<br>TEST: " . $_POST['home_phone'];
+						echo "<br>TEST: " . $_POST['student_id'];
+						*/
 
 						# Update Student.
-						$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s' WHERE id = '%s'", $_POST['first_name'], $_POST['last_name'], $_POST['student_id2']);
+						$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s', address = '%s', state = '%s', zipcode = '%s', major_id = '%s', edu_id = '%s', er_id = '%s', gender = '%s', birthdate = '%s', cell_phone = '%s', home_phone = '%s' WHERE id = '%s'", $_POST['first_name'], $_POST['last_name'], $_POST['address'], $_POST['state'], $_POST['zipcode'], $_POST['major'], $_POST['education'], $_POST['ethnic_racial'], $_POST['gender'], $_POST['birthdate'], $_POST['cell_phone'], $_POST['home_phone'], $_POST['student_id2']);
 						$res1 = mysqli_query($conex, $query);
 
-						if (mysqli_affected_rows($conex) == 0 && ($getFname != $_POST['first_name'] || $getLname != $_POST['last_name'])) {
+						if (mysqli_affected_rows($conex) == 0 && ($getFname != $_POST['first_name'] || $getLname != $_POST['last_name'] || $getAddress != $_POST['address'] || $getState != $_POST['state'] || $getZC != $_POST['zipcode'] || $getMid != $_POST['major'] || $getEid != $_POST['education'] || $getREid != $_POST['ethnic_racial'] || $getGender != $_POST['gender'] || $getBD != $_POST['birthdate'] || $getCphone != $_POST['cell_phone'] || $getHphone != $_POST['home_phone'])) {
 							echo "<p class='error'>Validating ID and Email... Failed! [No Student found]";
 							if ($show_error) {
 								echo "<br>[<i>" . mysqli_error() . "</i>]";
@@ -200,6 +233,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 										$passTA = $_POST['type_appointment'];
 										$passRID = $_POST['reason'];
 
+										$passSAD = $_POST['address'];
+										$passSST = $_POST['state'];
+										$passSZC = $_POST['zipcode'];
+										$passSBD = $_POST['birthdate'];
+										$passSCP = $_POST['cell_phone'];
+										$passSHP = $_POST['home_phone'];
+										$passSGE = $_POST['gender'];
+										$passSER = $_POST['ethnic_racial'];
+										$passSED = $_POST['education'];
+										$passSMA = $_POST['major'];
+
 										echo "<p class='result'><u>NEW DATA</u>
 												<br>  Name: " . $_POST['last_name'] . ", " . $_POST['first_name'] .
 												"<br>  E-mail: " . $_POST['email'] . 
@@ -235,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 										echo "<p><button type='button' value='WI' style='height: 30px;' onclick='mainDisplay(this)'>BACK</button></p>";
 									} else {
 										# Save New Student.
-										$query = sprintf("INSERT INTO Students VALUES('%s', '%s', '%s', '', '', '', '%s', '', '', '', '', '')", $_POST['student_id2'], $_POST['first_name'], $_POST['last_name'], $_POST['email']);
+										$query = sprintf("INSERT INTO Students VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '', '', '%s', '%s', '%s', '%s')", $_POST['student_id2'], $_POST['first_name'], $_POST['last_name'], $_POST['address'], $_POST['state'], $_POST['zipcode'], $_POST['email'], $_POST['birthdate'], $_POST['cell_phone'], $_POST['home_phone'], $_POST['gender'], $_POST['ethnic_racial'], $_POST['education'], $_POST['major']);
 										$res3 = mysqli_query($conex, $query);
 
 										if (mysqli_affected_rows($conex) == 0) {
@@ -392,10 +436,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		var passTA = "<?php echo $passTA ?>";
 		var passRID = "<?php echo $passRID ?>";
 
+		var passSAD = "<?php echo $passSAD ?>";
+		var passSST = "<?php echo $passSST ?>";
+		var passSZC = "<?php echo $passSZC ?>";
+		var passSBD = "<?php echo $passSBD ?>";
+		var passSCP = "<?php echo $passSCP ?>";
+		var passSHP = "<?php echo $passSHP ?>";
+		var passSGE = "<?php echo $passSGE ?>";
+		var passSER = "<?php echo $passSER ?>";
+		var passSED = "<?php echo $passSED ?>";
+		var passSMA = "<?php echo $passSMA ?>";
+
 	    var htm = $.ajax({
 	    type: "POST",
 	    url: "confirm_walk_in.php",
-	    data: {getSID: passSID, getSFN: passSFN, getSLN: passSLN, getSEM: passSEM, getCID: passCID, getLID: passLID, getTA: passTA, getRID: passRID},
+	    data: {getSID: passSID, getSFN: passSFN, getSLN: passSLN, getSEM: passSEM, getCID: passCID, getLID: passLID, getTA: passTA, getRID: passRID, getSAD: passSAD, getSST: passSST, getSZC: passSZC, getSBD: passSBD, getSCP: passSCP, getSHP: passSHP, getSGE: passSGE, getSER: passSER, getSED: passSED, getSMA: passSMA},
 	    async: false
 	    }).responseText;
 
@@ -429,13 +484,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div id="check_in_process"<?php if (isset($_POST['type_appointment'])) echo ' style="display: none;"'; ?>>
 	<h1>Check-In Process</h1>
 	<form action="check_in.php" method="post">	
-		<h2>* Required Fields</h2>
 		<p>
 			<span class="input">
 				<input type="radio" name="type_appointment" value="By-Appointment"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'By-Appointment')) echo ' checked="checked"'; ?> onclick="byAppointment()" /> By-Appointment
 				<input type="radio" name="type_appointment" value="Walk-In"<?php if (isset($_POST['type_appointment']) && ($_POST['type_appointment'] == 'Walk-In')) echo ' checked="checked"'; ?> onclick="walkIn()" /> Walk-In
 			</span>
+			<span style="display: inline-block;">
+				<font size="3" color="#888"><b>  * Required Fields</b></font>
+			</span>
 		</p>
+
 		<script type="text/javascript">
 			function byAppointment() {
 			    var x = document.getElementById("show_by_appointment");
@@ -463,105 +521,244 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			</p>
 		</div>
 		<div id="show_walk_in" style="display: none;">
-			<?php include ('includes/db_config.php');
-								
-				#LOCATIONS.
-				$query = "SELECT id, CONCAT(detail,' ',building_id,room) AS location FROM Locations ORDER BY location";
-				$result = mysqli_query($conex, $query);
-				if ($result) {
-					if (mysqli_num_rows($result) > 0) {
-						echo "<p>* Location:";
-						echo "<br><select name='location' style='width: 200px'>";
-							//echo "<option value=''>#Select</option>\n";
-							while ($row = mysqli_fetch_array($result)) {
-								$loc_id = $row['id'];
-								$loc_location = $row['location'];
-								echo "<option value='$loc_id'>$loc_location</option>\n";
-							}							
-						echo "</select>";
-						echo "</p>";
-					} else {
-						echo "<p>* Location:";
-						echo "<br><select name='location' style='width: 200px'>";
-							echo "<option value='' selected>EMPTY LIST</option>\n";
-						echo "</select>";
-						echo "</p>";
-					}
-				} else {
+			<table style="width: 550px">
+				<tr>
+					<td style="vertical-align: top; padding: 0 0 0 10px; border: 0px;">
+						<?php 
 
-				}
+							include ('includes/db_config.php');
+							#LOCATIONS.
+							$query = "SELECT id, CONCAT(detail,' ',building_id,room) AS location FROM Locations ORDER BY location";
+							$loc_res = mysqli_query($conex, $query);
+							if ($loc_res) {
+								if (mysqli_num_rows($loc_res) > 0) {
+									echo "<p>* Location:";
+									echo "<br><select name='location' style='width: 200px'>";
+										while ($row = mysqli_fetch_array($loc_res)) {
+											$loc_id = $row['id'];
+											$loc_location = $row['location'];
+											echo "<option value='$loc_id'>$loc_location</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo "<p>* Location:";
+									echo "<br><select name='location' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
 
-				#CONSULTANTS.
-				$query = "SELECT id, CONCAT(last_name,', ',first_name) AS consultant FROM Consultants ORDER BY consultant";
-				$result = mysqli_query($conex, $query);
-				if ($result) {
-					if (mysqli_num_rows($result) > 0) {
-						echo "<p>* Consultant:";
-						echo "<br><select name='consultant' style='width: 200px'>";
-							echo "<option value=''>#Select</option>\n";
-							while ($row = mysqli_fetch_array($result)) {
-								$con_id = $row['id'];
-								$con_consultant = $row['consultant'];
-								echo "<option value='$con_id'>$con_consultant</option>\n";
-							}							
-						echo "</select>";
-						echo "</p>";
-					} else {
-						echo "<p>* Consultant:";
-						echo "<br><select name='consultant' style='width: 200px'>";
-							echo "<option value='' selected>EMPTY LIST</option>\n";
-						echo "</select>";
-						echo "</p>";
-					}
-				} else {
+								mysqli_free_result($loc_res);
+							} else {
+								echo "<p class='error'>* Location:";
+								echo "<br>[Connection Error]";
+								echo "</p>";
+							}
 
-				}
+							#CONSULTANTS.
+							$query = "SELECT id, CONCAT(last_name,', ',first_name) AS consultant FROM Consultants ORDER BY consultant";
+							$cons_res = mysqli_query($conex, $query);
+							if ($cons_res) {
+								if (mysqli_num_rows($cons_res) > 0) {
+									echo "<p> * Consultant: ";
+									echo "<br><select id='consultant' name='consultant' style='width: 200px'>";
+										echo "<option value=''>#Select</option>\n";
+										while ($row = mysqli_fetch_array($cons_res)) {
+											$con_id = $row['id'];
+											$con_consultant = $row['consultant'];
+											echo "<option value='$con_id'>$con_consultant</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo " * Consultant: ";
+									echo "<select name='consultant' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
 
-				#REASONS.
-				$query = "SELECT id, description FROM Reasons ORDER BY description";
-				$result = mysqli_query($conex, $query);
-				if ($result) {
-					if (mysqli_num_rows($result) > 0) {
-						echo "<p>* Reason:";
-						echo "<br><select name='reason' style='width: 200px'>";
-							echo "<option value=''>#Select</option>\n";
-							while ($row = mysqli_fetch_array($result)) {
-								$re_id = $row['id'];
-								$re_description = $row['description'];
-								echo "<option value='$re_id'>$re_description</option>\n";
-							}							
-						echo "</select>";
-						echo "</p>";
-					} else {
-						echo "<p>* Reasons:";
-						echo "<br><select name='reason' style='width: 200px'>";
-							echo "<option value='' selected>EMPTY LIST</option>\n";
-						echo "</select>";
-						echo "</p>";
-					}
-				} else {
+								mysqli_free_result($cons_res);
+							} else {
+								echo " * Consultant: ";
+								echo "[Connection Error]";
+								echo "</p>";
+							}
 
-				}
+							#REASONS.
+							$query = "SELECT id, description FROM Reasons ORDER BY description";
+							$rea_res = mysqli_query($conex, $query);
+							if ($rea_res) {
+								if (mysqli_num_rows($rea_res) > 0) {
+									echo "<p>* Reason:";
+									echo "<br><select name='reason' style='width: 200px'>";
+										echo "<option value=''>#Select</option>\n";
+										while ($row = mysqli_fetch_array($rea_res)) {
+											$re_id = $row['id'];
+											$re_description = $row['description'];
+											echo "<option value='$re_id'>$re_description</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo "<p>* Reason:";
+									echo "<br><select name='reason' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
 
-				mysqli_free_result($result);
-				mysqli_close($conex);
-			?>
+								mysqli_free_result($rea_res);
+							} else {
+								echo "<p class='error'>* Reason:";
+								echo "<br>[Connection Error]";
+								echo "</p>";
+							}
 
-			<p>* Student ID (without leading zeros):
-				<br><input type="text" name="student_id2" value="<?php if (isset($_POST['student_id2'])) echo $_POST['student_id2']; ?>" style="width: 190px" />
-			</p>
-			<p>* First Name:
-				<br><input type="text" name="first_name" value="<?php if (isset($_POST['first_name'])) echo $_POST['first_name']; ?>" style="width: 190px" />
-			</p>
-			<p>* Last Name:
-				<br><input type="text" name="last_name" value="<?php if (isset($_POST['last_name'])) echo $_POST['last_name']; ?>" style="width: 190px" />
-			</p>
-			<p>* E-mail:
-				<br><input type="text" name="email" value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?>" style="width: 190px" />
-			</p>
+						?>
+
+						<p>* Student ID (without leading zeros):
+							<br><input type="text" name="student_id2" value="<?php if (isset($_POST['student_id2'])) echo $_POST['student_id2']; ?>" style="width: 190px" />
+						</p>
+						<p>* First Name:
+							<br><input type="text" name="first_name" value="<?php if (isset($_POST['first_name'])) echo $_POST['first_name']; ?>" style="width: 190px" />
+						</p>
+						<p>* Last Name:
+							<br><input type="text" name="last_name" value="<?php if (isset($_POST['last_name'])) echo $_POST['last_name']; ?>" style="width: 190px" />
+						</p>
+						<p>* E-mail:
+							<br><input type="text" name="email" value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?>" style="width: 190px" />
+						</p>
+						<p>Address | *State | *Zipcode:
+							<br><input type="text" name="address" value="<?php if (isset($_POST['address'])) echo $_POST['address']; ?>" style="width: 190px" />
+							<br><select name='state' style='width: 140px'>
+								<option value=''>#Select</option>
+								<option value='FL'>Florida</option>
+								<option value='NJ'>New Jersey</option>
+								<option value='NY'>New York</option>
+								<option value='PA'>Pennsylvania</option>
+							</select>
+							<input type="text" name="zipcode" value="<?php if (isset($_POST['zipcode'])) echo $_POST['zipcode']; ?>" style="width: 45px" />
+						</p>					
+					</td>
+					<td style="vertical-align: top; text-align: left; border: 0px;">
+						<?php
+
+							#MAJOR.
+							$query = "SELECT id, name FROM Majors ORDER BY name";
+							$major_res = mysqli_query($conex, $query);
+							if ($major_res) {
+								if (mysqli_num_rows($major_res) > 0) {
+									echo "<p>* Major:";
+									echo "<br><select name='major' style='width: 200px'>";
+										echo "<option value=''>#Select</option>\n";
+										while ($row = mysqli_fetch_array($major_res)) {
+											$major_id = $row['id'];
+											$major_name = $row['name'];
+											echo "<option value='$major_id'>$major_name</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo "<p>* Major:";
+									echo "<br><select name='major' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
+
+								mysqli_free_result($major_res);
+							} else {
+								echo "<p class='error'>* Major:";
+								echo "<br>[Connection Error]";
+								echo "</p>";
+							}
+
+							#EDUCATION.
+							$query = "SELECT id, description FROM Education";
+							$edu_res = mysqli_query($conex, $query);
+							if ($edu_res) {
+								if (mysqli_num_rows($edu_res) > 0) {
+									echo "<p>* Education (year):";
+									echo "<br><select name='education' style='width: 200px'>";
+										echo "<option value=''>#Select</option>\n";
+										while ($row = mysqli_fetch_array($edu_res)) {
+											$edu_id = $row['id'];
+											$edu_description = $row['description'];
+											echo "<option value='$edu_id'>$edu_description</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo "<p>* Education (year):";
+									echo "<br><select name='education' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
+
+								mysqli_free_result($edu_res);
+							} else {
+								echo "<p class='error'>* Education (year):";
+								echo "<br>[Connection Error]";
+								echo "</p>";
+							}
+
+							#ETHNIC-RACIAL.
+							$query = "SELECT id, description FROM Ethnic_Racial";
+							$er_res = mysqli_query($conex, $query);
+							if ($er_res) {
+								if (mysqli_num_rows($er_res) > 0) {
+									echo "<p>* Race/Ethnicity:";
+									echo "<br><select name='ethnic_racial' style='width: 200px'>";
+										echo "<option value=''>#Select</option>\n";
+										while ($row = mysqli_fetch_array($er_res)) {
+											$er_id = $row['id'];
+											$er_description = $row['description'];
+											echo "<option value='$er_id'>$er_description</option>\n";
+										}							
+									echo "</select>";
+									echo "</p>";
+								} else {
+									echo "<p>* Race/Ethnicity:";
+									echo "<br><select name='ethnic_racial' style='width: 200px'>";
+										echo "<option value='' selected>EMPTY LIST</option>\n";
+									echo "</select>";
+									echo "</p>";
+								}
+
+								mysqli_free_result($er_res);
+							} else {
+								echo "<p class='error'>* Race/Ethnicity:";
+								echo "<br>[Connection Error]";
+								echo "</p>";
+							}
+
+							mysqli_close($conex);
+						?>
+						<p>* Gender:
+							<br><select name='gender' style='width: 200px'>
+								<option value=''>#Select</option>
+								<option value='Female'>Female</option>
+								<option value='Male'>Male</option>
+							</select>
+						</p>
+						<p>Birthdate (mm/dd/yyyy):
+							<br><input type="date"  name="birthdate" style="font-size: 1.6em; height: 20px; width: 190px">
+						</p>
+						<p>Cell-Phone:
+							<br><input type="text" name="cell_phone" value="<?php if (isset($_POST['cell_phone'])) echo $_POST['cell_phone']; ?>" style="width: 190px" />
+						</p>
+						<p>Home-Phone:
+							<br><input type="text" name="home_phone" value="<?php if (isset($_POST['home_phone'])) echo $_POST['home_phone']; ?>" style="width: 190px" />
+						</p>						
+					</td>
+				</tr>
+			</table>
 		</div>
 		<div id="show_submit" style="display: none;">
-			<p><input class="button" type="submit" name="submit" value="CHECK-IN" style="height: 30px; width: 200px" /></p>
+			<p>   <input class="button" type="submit" name="submit" value="CHECK-IN" style="height: 30px; width: 200px" /></p>
 		</div>
 	</form>
 </div>
