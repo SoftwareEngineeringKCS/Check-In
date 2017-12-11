@@ -19,8 +19,22 @@
 	$getTA = $_REQUEST['getTA'];
 	$getRID = $_REQUEST['getRID'];
 
+	$getSAD = $_REQUEST['getSAD'];
+	$getSST = $_REQUEST['getSST'];
+	$getSZC = $_REQUEST['getSZC'];
+	$getSBD = $_REQUEST['getSBD'];
+	$getSCP = $_REQUEST['getSCP'];
+	$getSHP = $_REQUEST['getSHP'];
+	$getSGE = $_REQUEST['getSGE'];
+	$getSER = $_REQUEST['getSER'];
+	$getSED = $_REQUEST['getSED'];
+	$getSMA = $_REQUEST['getSMA'];
+
 	# Update Student.
-	$query = sprintf("UPDATE Students SET first_name = '%s', last_name = '%s', email = '%s' WHERE id = '%s'", $getSFN, $getSLN, $getSEM, $getSID);
+	$query = sprintf("UPDATE Students 
+						SET first_name = '%s', last_name = '%s', email = '%s', address = '%s', state = '%s', zipcode = '%s', major_id = '%s', edu_id = '%s', er_id = '%s', gender = '%s', birthdate = '%s', cell_phone = '%s', home_phone = '%s' 
+						WHERE id = '%s'", 
+						$getSFN, $getSLN, $getSEM, $getSAD, $getSST, $getSZC, $getSMA, $getSED, $getSER, $getSGE, $getSBD, $getSCP, $getSHP, $getSID);
 	$conf_res1 = mysqli_query($conex, $query);
 
 	if (mysqli_affected_rows($conex) == 0) {
