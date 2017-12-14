@@ -513,11 +513,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			}
 		</script>
 		<div id="show_by_appointment" style="display: none;">
-			<p>* Student ID (no leading zeros):
-				<br><input type="text" name="student_id1" value="<?php if (isset($_POST['student_id1'])) echo $_POST['student_id1']; ?>" style="width: 190px" />
+			<p>   * Student ID (no leading zeros):
+				<br>   <input type="text" name="student_id1" value="<?php if (isset($_POST['student_id1'])) echo $_POST['student_id1']; ?>" style="width: 190px" />
 			</p>
-			<p>* Confirmation Code:
-				<br><input type="text" name="confirm_num" value="<?php if (isset($_POST['confirm_num'])) echo $_POST['confirm_num']; ?>" style="width: 190px" />
+			<p>   * Confirmation Code:
+				<br>   <input type="text" name="confirm_num" value="<?php if (isset($_POST['confirm_num'])) echo $_POST['confirm_num']; ?>" style="width: 190px" />
 			</p>
 		</div>
 		<div id="show_walk_in" style="display: none;">
